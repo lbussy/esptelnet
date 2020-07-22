@@ -1,3 +1,5 @@
+:exclamation: This is a fork of [yasheena](https://github.com/yasheena) / [telnetspy](https://github.com/yasheena/telnetspy). The documentation below is from the original and may not (likely does not) reflect usage for this repository.
+
 <h3 align="center">Telnet server for ESP8266 / ESP32</h3>
 
 ---
