@@ -1,4 +1,4 @@
-TelnetSpy	KEYWORD1
+ESPTelnet	KEYWORD1
 
 handle	KEYWORD2
 setPort	KEYWORD2
