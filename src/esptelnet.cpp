@@ -31,7 +31,8 @@ static void ESPTelnet_putc(char c) {
 	}
 }
 
-static void ESPTelnet_ignore_putc(char c) {;
+static void ESPTelnet_ignore_putc(char c) {
+	;
 }
 
 ESPTelnet::ESPTelnet() {
