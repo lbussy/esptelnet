@@ -231,6 +231,7 @@ class ESPTelnet : public Stream {
 		operator bool() const;
 		void setDebugOutput(bool);
 		uint32_t baudRate(void);
+		void baudUpdate(unsigned long);
 
 	protected:
 		CRITCAL_SECTION_MUTEX

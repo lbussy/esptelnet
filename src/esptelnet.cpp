@@ -428,6 +428,12 @@ uint32_t ESPTelnet::baudRate(void) {
 	return 115200;
 }
 
+void ESPTelnet::baudUpdate(unsigned long baud) {
+	if (usedSer) {
+		usedSer->updateBaudRate(baud);
+	}
+}
+
 void ESPTelnet::sendBlock() {
 CRITCAL_SECTION_START
 	uint16_t len = bufUsed;
