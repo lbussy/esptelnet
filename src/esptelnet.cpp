@@ -25,13 +25,13 @@ extern "C" {
 static ESPTelnet* actualObject = NULL;
 
 
-static void ESPTelnet_putc(char c) {
+static void __attribute__((unused)) ESPTelnet_putc(char c) {
 	if (actualObject) {
   		actualObject->write(c);
 	}
 }
 
-static void ESPTelnet_ignore_putc(char c) {
+static void __attribute__((unused)) ESPTelnet_ignore_putc(char c) {
 	;
 }
 
@@ -270,7 +270,7 @@ int ESPTelnet::available (void) {
 }
 
 int ESPTelnet::read (void) {
-	int val;
+	int val = 0;
 	if (usedSer) {
 		val = usedSer->read();
 		if (val != -1) {
@@ -286,7 +286,7 @@ int ESPTelnet::read (void) {
 }
     
 int ESPTelnet::peek (void) {
-	int val;
+	int val = 0;
 	if (usedSer) {
 		val = usedSer->peek();
 		if (val != -1) {
