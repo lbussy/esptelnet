@@ -25,13 +25,13 @@ extern "C" {
 static ESPTelnet* actualObject = NULL;
 
 
-static void TelnetSpy_putc(char c) {
+static void ESPTelnet_putc(char c) {
 	if (actualObject) {
   		actualObject->write(c);
 	}
 }
 
-static void TelnetSpy_ignore_putc(char c) {;
+static void ESPTelnet_ignore_putc(char c) {;
 }
 
 ESPTelnet::ESPTelnet() {
@@ -403,7 +403,7 @@ void ESPTelnet::setDebugOutput(bool en) {
 	if (debugOutput) {
 		actualObject = this;
 #ifdef ESP8266		
-		os_install_putc1((void*) TelnetSpy_putc);  // Set system printing (os_printf) to ESPTelnet
+		os_install_putc1((void*) ESPTelnet_putc);  // Set system printing (os_printf) to ESPTelnet
 		system_set_os_print(true);
 #else // ESP32
 		// ToDo: How can be done this for ESP32 ?
@@ -412,7 +412,7 @@ void ESPTelnet::setDebugOutput(bool en) {
 		if (actualObject == this) {
 #ifdef ESP8266		
 			system_set_os_print(false);
-			os_install_putc1((void*) TelnetSpy_ignore_putc); // Ignore system printing
+			os_install_putc1((void*) ESPTelnet_ignore_putc); // Ignore system printing
 #else // ESP32
 			// ToDo: How can be done this for ESP32 ?
 #endif
