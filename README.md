@@ -1,250 +1,183 @@
-:exclamation: This is a fork of [yasheena](https://github.com/yasheena) / [telnetspy](https://github.com/yasheena/telnetspy). The documentation below is from the original and may not (likely does not) reflect usage for this repository.
+:exclamation: This is a (disconnected) fork of [yasheena](https://github.com/yasheena) / [telnetspy](https://github.com/yasheena/telnetspy). That project seemed as if the author abandoned it.  And to be honest, ain't nobody got time for that!
 
-<h3 align="center">Telnet server for ESP8266 / ESP32</h3>
+# Telnet server for ESP8266 / ESP32
+
+Access the controller's serial port via Telnet.
 
 ---
 
-<p align="center"> Cloning the serial port via Telnet.
-    <br> 
-</p>
+[![GitHub Issues](https://img.shields.io/github/issues/lbussy/esptelnet.svg)](https://github.com/lbussy/esptelnet/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/lbussy/esptelnet.svg)](https://github.com/lbussy/esptelnet/pulls)
 
-<div align="center">
+## Table of Contents
 
-  [![GitHub Issues](https://img.shields.io/github/issues/yasheena/telnetspy.svg)](https://github.com/yasheena/telnetspy/issues)
-  [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/yasheena/telnetspy.svg)](https://github.com/yasheena/telnetspy/pulls)
-
-</div>
-
-## 📝 Table of Contents
 - [Description](#description)
 - [Usage](#usage)
-  - [General](#general)
+  - [Basic](#basic)
   - [Functions](#functions)
 - [License](#license)
 
+## Description <a name = "description"></a>
 
-## 🎈 Description <a name = "description"></a>
+- This library allows you to interact with the controller (in most cases) as if you connected directly to the serial port. Use ```ESPTelnet``` instead of ```Serial``` to send data to the serial port and a Telnet connection simultaneously. 
+- There is a circular buffer that stores data when a Telnet connection is not available. In that way, it is possible to accumulate data even while the controller sets up network connections.
+- You may choose to create a Telnet session only if it is necessary.
+- The controller will process data to the ESP8266 / ESP32 via Telnet as data received from the serial port.
+- You may use more than one instance of ESPTelnet. For example: To send control information on the first instance and data dumps on the second instance.
+ 	 	
+## Usage <a name = "usage"></a>
 
-- This module allows you to do "debugging over the air". So if you already use ArduinoOTA, this is a helpful extension for wireless development. Use ```TelnetSpy``` instead of ```Serial``` to send data to the serial port and a copy to a Telnet connection. 
-- There is a circular buffer which allows to store the data while the Telnet connection is not established. So it's possible to collect data even when the WiFi and Telnet connections are not yet established.
-- It's also possible to create a Telnet session only if it is neccessary: then you will get the already collected data as far as it is still stored in the circular buffer. Data sent from Telnet terminal to ESP8266 / ESP32 will be handled as data received by serial port.
-- It is also possible to use more than one instance of TelnetSpy. For example - To send control information on the first instance and data dumps on the second instance.
-
-## 🚀 Usage <a name = "usage"></a>
-
-### General <a name = "general"></a>
+### Basic <a name = "basic"></a>
 
 Add the following line to your sketch:
 ```
-#include <TelnetSpy.h>
-TelnetSpy LOG;
+#include <ESPTelnet.h>
+ESPTelnet MYSERIAL;
 ```
 
-Add the following line to your initialisation block ```void setup()```:
+Add the following line to your initialization block ```void setup()```:
 ```
-LOG.begin();
-```
-
-Add the following line at the beginning of your main loop ```void loop()```:
-```
-LOG.handle();
+MYSERIAL.begin();
 ```
 
-### Use the following functions of the TelnetSpy object to modify behavior <a name = "functions"></a>
+Add the following line within your main loop ```void loop()```:
+```
+MYSERIAL.handle();
+```
 
-1. [void setPort()](#setPort)
-2. [void setWelcomeMsg()](#setWelcomeMsg)
-3. [void setRejectMsg()](#setRejectMsg)
-4. [void setMinBlockSize()](#setMinBlockSize)
-5. [void setCollectingTime()](#setCollectingTime)
-6. [void setMaxBlockSize()](#setMaxBlockSize)
-7. [bool setBufferSize()](#setBufferSize)
-8. [uint16_t getBufferSize()](#getBufferSize)
-9. [void setStoreOffline()](#setStoreOffline)
-10. [bool getStoreOffline()](#getStoreOffline)
-11. [void setPingTime()](#setPingTime)
-12. [void setSerial()](#setSerial)
-14. [bool isClientConnected()](#isClientConnected)
-14. [void setCallbackOnConnect()](#setCallbackOnConnect)
-15. [void setCallbackOnDisconnect()](#setCallbackOnDisconnect)
+Also, see the [sample code](https://github.com/lbussy/esptelnet/blob/master/examples/basic/basic.ino) for a fully-functioning example.
+
+### Use the following functions of the ESPTelnet object to modify behavior <a name = "functions"></a>
+
+#. [void begin()](#begin)
+#. [void setPort()](#setPort)
+#. [void setWelcomeMsg()](#setWelcomeMsg)
+#. [void setRejectMsg()](#setRejectMsg)
+#. [void setMinBlockSize()](#setMinBlockSize)
+#. [void setCollectingTime()](#setCollectingTime)
+#. [void setMaxBlockSize()](#setMaxBlockSize)
+#. [bool setBufferSize()](#setBufferSize)
+#. [uint16_t getBufferSize()](#getBufferSize)
+#. [void setStoreOffline()](#setStoreOffline)
+#. [bool getStoreOffline()](#getStoreOffline)
+#. [void setPingTime()](#setPingTime)
+#. [void setSerial()](#setSerial)
+#. [bool isClientConnected()](#isClientConnected)
+#. [void setCallbackOnConnect()](#setCallbackOnConnect)
+#. [void setCallbackOnDisconnect()](#setCallbackOnDisconnect)
+#. [void disconnectClient()](#disconnectClient)
+#. [void handle()](#handle)
+#. [void end()](#end)
 
 ---
 
-### 1. void setPort(uint16_t portToUse) <a name = "setPort"></a>
+### void begin(unsigned long baud) <a name = "begin"></a>
 
-Change the port number of this Telnet server. If a client is already connected, it will be disconnected.
+The ```begin()``` method has ESP32 and ESP8266 variants.:
 
-Default: 23
+#### ESP8266
 
-```
-void setPort(uint16_t portToUse)
-```
+void begin(unsigned long baud)
+void begin(unsigned long baud, SerialConfig config)
+void begin(unsigned long baud, SerialConfig config, SerialMode mode)
+void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin);
 
-### 2. void setWelcomeMsg(char* msg) <a name = "setWelcomeMsg"></a>
+#### ESP32
 
-Change the message which will be sent to the Telnet client after a session is established.
+void begin(unsigned long baud, uint32_t config = SERIAL_8N1, int8_t rxPin = -1, int8_t txPin = -1, bool invert = false);
 
-Default: "Connection established via TelnetSpy.\n"
+### void setPort(uint16_t portToUse) <a name = "setPort"></a>
 
-```
-void setWelcomeMsg(char* msg)
-```
-
-### 3. void setRejectMsg(char* msg) <a name = "setRejectMsg"></a>
-
-Change the message which will be sent to the Telnet client if another session is already established.
-
-Default: "TelnetSpy: Only one connection possible.\n"
-
-```
-void setRejectMsg(char* msg)
-```
-
-### 4. void setMinBlockSize(uint16_t minSize) <a name = "setMinBlockSize"></a>
-
-Change the amount of characters to collect before sending a Telnet block.
+Set or change the port number of this Telnet server. If a client is already connected, it will be disconnected.
 
 Default: 64 
 
-```
-void setMinBlockSize(uint16_t minSize)
-```
+### void setWelcomeMsg(const char* msg) <a name = "setWelcomeMsg"></a>
 
-### 5. void setCollectingTime(uint16_t colTime) <a name = "setCollectingTime"></a>
+Change the message which displays to the Telnet client after establishing a session.
+
+Default: "Connection established via ESPTelnet."`
+
+### void setRejectMsg(char* msg) <a name = "setRejectMsg"></a>
+
+Change the error message that will be sent to the Telnet client if attempting a second connection to the same server.
+
+Default: "ESPTelnet: Only one connection at a time is possible."
+
+### void setMinBlockSize(uint16_t minSize) <a name = "setMinBlockSize"></a>
+
+Change the number of characters to collect before sending a Telnet block.
+
+Default: 64 
+
+### void setCollectingTime(uint16_t colTime) <a name = "setCollectingTime"></a>
 
 Change the time (in ms) to wait before sending a Telnet block if it's size is less than <minSize> (defined by ```setMinBlockSize```).
 
 Default: 100
 
-```
-void setCollectingTime(uint16_t colTime)
-```
-
-### 6. void setMaxBlockSize(uint16_t maxSize) <a name = "setMaxBlockSize"></a>
+### void setMaxBlockSize(uint16_t maxSize) <a name = "setMaxBlockSize"></a>
 
 Change the maximum size of the Telnet packets to send.
 
 Default: 512
 
-```
-void setMaxBlockSize(uint16_t maxSize)
-```
+### bool setBufferSize(uint16_t newSize) <a name = "setBufferSize"></a>
 
-### 7. bool setBufferSize(uint16_t newSize) <a name = "setBufferSize"></a>
-
-Change the size of the ring buffer. Set it to ```0``` to disable buffering. Changing size tries to preserve the already collected data. If the new buffer size is too small, only the latest data will be preserved. Returns ```false``` if the requested buffer size cannot be set.
+Change the size of the circular buffer. Set to ```0``` to disable buffering. Changing size tries to preserve the already collected data. If the new buffer size is smaller than the currently buffered data, it will truncate the buffer. Returns ```false``` if the method cannot set the requested buffer size.
 
 Default: 3000
 
-```
-bool setBufferSize(uint16_t newSize)
-```
-
-### 8. uint16_t getBufferSize() <a name = "getBufferSize"></a>
+### uint16_t getBufferSize() <a name = "getBufferSize"></a>
 
 This function returns the actual size of the ring buffer.
 
-```
-uint16_t getBufferSize()
-```
+### void setStoreOffline(bool store) <a name = "setStoreOffline"></a>
 
-### 9. void setStoreOffline(bool store) <a name = "setStoreOffline"></a>
-
-Enable / disable storing new data in the ring buffer if no Telnet connection is established. This function allows you to store important data only. You can do this by disabling ```storeOffline``` for sending unimportant data.
+Enable/disable storing new data in the ring buffer if there is no Telnet connection established. This function allows you to store essential data only. You can do this by disabling ```storeOffline``` while sending unimportant data.
 
 Default: true
 
-```
-void setStoreOffline(bool store)
-```
+### bool getStoreOffline() <a name = "getStoreOffline"></a>
 
-### 10. bool getStoreOffline() <a name = "getStoreOffline"></a>
+Get the state of storing data when offline.
 
-Get actual state of storing data when offline.
+### void setPingTime(uint16_t pngTime) <a name = "setPingTime"></a>
 
-```
-bool getStoreOffline()
-```
-
-### 11. void setPingTime(uint16_t pngTime) <a name = "setPingTime"></a>
-
-If no data is sent via TelnetSpy, the detection of a disconnected client has a long timeout. Use ```setPingTime``` to define the time (in ms) without traffic after which a ping aka a ```chr(0)``` is sent to the Telnet client to detect a disconnect earlier. Use ```0``` as parameter to disable pings.
+Use ```setPingTime``` to define the time (in ms) without traffic, after which the controller sends a ping (```chr(0)```) to the Telnet client. Use ```0``` to disable pings.
 
 Default: 1500  
 
-```
-void setPingTime(uint16_t pngTime)
-```
+### void setSerial(HardwareSerial* usedSerial) <a name = "setSerial"></a>
 
-### 12. void setSerial(HardwareSerial* usedSerial) <a name = "setSerial"></a>
-
-Set the serial port you want to use with this object (especially for ESP32) or ```NULL``` if no serial port should be used (Telnet only).
+Set the serial port you want to use with this object, or ```NULL``` if no serial port should be used (Telnet only).
 
 Default: Serial
 
-```
-void setSerial(HardwareSerial* usedSerial)
-```
-
-### 13. bool isClientConnected() <a name = "isClientConnected"></a>
+### bool isClientConnected() <a name = "isClientConnected"></a>
 
 This function returns true if a Telnet client is connected.
 
-```
-bool isClientConnected()
-```
+### void setCallbackOnConnect(void (*callback)()) <a name = "setCallbackOnConnect"></a>
 
-### 14. void setCallbackOnConnect(void (*callback)()) <a name = "setCallbackOnConnect"></a>
-
-This function installs a callback function which will be called on every Telnet connect of this object (except rejected connect tries). Use ```NULL``` to remove the callback.
+This function installs a callback function, which executes upon every connection (except rejected connect tries). Use ```NULL``` to remove the callback.
 
 Default: NULL
 
-```
-void setCallbackOnConnect(void (*callback)())
-```
+### void setCallbackOnDisconnect(void (*callback)()) <a name = "setCallbackOnDisconnect"></a>
 
-### 15. void setCallbackOnDisconnect(void (*callback)()) <a name = "setCallbackOnDisconnect"></a>
-
-This function installs a callback function which will be called on every Telnet disconnect of this object (except rejected connect tries). Use ```NULL``` to remove the callback.
+This function installs a callback function, which executes upon every Telnet disconnect (except rejected connect tries). Use ```NULL``` to remove the callback.
 
 Default: NULL
 
-```
-void setCallbackOnDisconnect(void (*callback)())
-```
+### void disconnectClient() <a name = "disconnectClient"></a>
 
-## 💡 Hint <a name = "hint"></a>
+This method forces a clean client disconnection.
 
-Add the following lines to your sketch:
+### void handle() <a name = "handle"></a>
 
-```
-TelnetSpy SerialAndTelnet;
-#define SERIAL SerialAndTelnet
-// #define SERIAL Serial
-```
+Call this method at the beginning of the ```loop()``` to process data in and out of the Telnet connection.
 
-Replace ```Serial``` with ```SERIAL``` in your sketch. Now you can switch between serial only and serial with Telnet by only changing the comments of the defines.
- 
-## 🔔 Important <a name = "important"></a>
+### void end() <a name = "end"></a>
 
-- To connect to the Telnet server you have to:
-    1. Establish the WiFi connection.
-    2. Execute ```SerialAndTelnet.begin(WhatEverYouWant)```.
- 
-💡 **Note:** The order is not important.
-
-- Everything you do with ```Serial```, you can do with ```TelnetSpy``` too. But remember: Transfering data also via Telnet will need more performance than the serial port only. So time critical things may be influenced.
-
-- It is not possible to establish more than one Telnet connection at the same time. But it's possible to use more than one instance of TelnetSpy.
-
-- If you have problems with low memory, you may reduce the value of the ```define TELNETSPY_BUFFER_LEN``` for a smaller ring buffer on initialisation.    
-
-- Usage of ```void setDebugOutput(bool)``` to enable / disable of capturing of os_print calls when you have more than one TelnetSpy instance: That TelnetSpy object will handle this functionality where you used ```setDebugOutput``` at last.
-On default, TelnetSpy has the capturing of OS_print calls enabled. So if you have more instances the last created instance will handle the capturing. 
- 
-## 📖 License <a name = "license"></a>
-
-This library is open-source and licensed under the [MIT license](http://opensource.org/licenses/MIT).
-
-Do whatever you like with it, but contributions are appreciated!
+Closes the object and deletes it from memory.
